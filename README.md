@@ -1,8 +1,10 @@
 # vedit
 
-`vedit` is a small Rust command-line wrapper that runs `auto-editor` to remove silent parts from a video and then uses `ffmpeg` to adjust playback speed. It automates the two-step process: run `auto-editor` with a configurable margin, then apply video and audio speed filters with `ffmpeg`.
+`vedit` is a small Rust command-line wrapper that runs `auto-editor` to remove silent parts from a video and then uses `ffmpeg` to adjust playback speed.
 
-This repository contains a minimal CLI (see `src/main.rs`) that expects `auto-editor` and `ffmpeg` to be available on your PATH.
+It automates the two-step process: run `auto-editor` with a configurable margin, then apply video and audio speed filters with `ffmpeg`.
+
+This tool expects `auto-editor` and `ffmpeg` to be available on your PATH.
 
 ## Requirements
 
@@ -11,8 +13,8 @@ This repository contains a minimal CLI (see `src/main.rs`) that expects `auto-ed
 - `ffmpeg` — installed and available on your PATH
 
 Note: `vedit` assumes that after running:
-`auto-editor <input> --margin <N>sec`
-an altered file will exist with the same stem as the input and the suffix `_ALTERED` (e.g. `video.mp4` -> `video_ALTERED.mp4`). Ensure your `auto-editor` installation/version produces that output or configure/move the file accordingly.
+`auto-editor <input> --margin <N>sec`,
+an altered file will exist with the same stem as the input and the suffix `_ALTERED` (e.g. `video.mp4` -> `video_ALTERED.mp4`).
 
 ## Building
 
@@ -55,7 +57,7 @@ vedit input.mp4 --margin 0.2 --speed 1.5 --output output.mp4
 
 The CLI performs the following steps:
 
-1. Parses arguments using `clap`.
+1. Parses arguments.
 2. Runs:
    - `auto-editor <input> --margin <margin>sec`
    - Expects an altered file named `<stem>_ALTERED.<ext>` to exist after that command.
@@ -69,18 +71,6 @@ The code returns errors when the external commands exit with non-zero status:
 - If `auto-editor` fails, the program reports `auto-editor failed`.
 - If `ffmpeg` fails, the program reports `ffmpeg failed`.
 
-## Limitations and caveats
-
-- `atempo` accepts only certain ranges per filter invocation (commonly 0.5–2.0). If you pass a `--speed` outside ffmpeg's single-step `atempo` range, `ffmpeg` may fail. A robust solution would chain multiple `atempo` filters for larger speed multipliers (not implemented here).
-- The tool relies on `auto-editor` producing an altered file with the `_ALTERED` suffix. If your `auto-editor` version uses a different naming pattern, you'll need to rename the altered file before `vedit` runs `ffmpeg`, or modify the code.
-- This is a thin wrapper: all heavy lifting is done by `auto-editor` and `ffmpeg`. `vedit` does not attempt to parse or modify media streams itself.
-
 ## Contributing
 
-This project is intentionally small. If you want to:
-
-- Support chaining `atempo` for arbitrary speeds,
-- Make the altered filename configurable,
-- Add better logging or dry-run mode,
-
-feel free to open a PR or modify `src/main.rs`.
+This project is intentionally small. Feel free to open a PR.
